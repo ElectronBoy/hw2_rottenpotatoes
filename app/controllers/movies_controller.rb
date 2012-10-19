@@ -8,24 +8,28 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.unique_column(:rating)
-    @sort = params[:sort]
 
-    if not params[:commit].eql? "Refresh" 
-      params[:ratings] = Hash[@all_ratings.map {|rating| [rating, 1]}]
-    end
+    session[:sort] = nil unless session.has_key? :sort
+    @sort = params.has_key?(:sort) ? params[:sort] : session[:sort]
 
-    if not params[:ratings]
-      @select_ratings = {}
-    else
-      @select_ratings = params[:ratings]
-    end
+    session[:ratings] = {} unless session.has_key? :ratings
+    @select_ratings = params.has_key?(:ratings) ? params[:ratings] : session[:ratings]
 
-
-#    if params[:ratings]
-      @movies = Movie.find(:all, :conditions => ["rating in (?)", @select_ratings.keys], :order => params[:sort])
-#    else
-#      @movies = Movie.find(:all, :order => params[:sort])
+#    if not params[:commit].eql? "Refresh" 
+#      params[:ratings] = Hash[@all_ratings.map {|rating| [rating, 1]}]
 #    end
+
+    session[:ratings] = @select_ratings
+    session[:sort] = @sort
+
+    if not params.has_key?(:ratings)
+      puts "Testing"
+      redirect_to :action => :index, :ratings => session[:ratings], :sort => session[:sort]
+    else
+      print params[:ratings]
+    end
+
+    @movies = Movie.find(:all, :conditions => ["rating in (?)", @select_ratings.keys], :order => params[:sort])
   end
 
   def new
