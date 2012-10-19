@@ -7,8 +7,6 @@
     = check_box_tag "ratings[#{rating}]", @select_ratings[rating],  @select_ratings.has_key?(rating)
   = submit_tag 'Refresh', {:id => :ratings_submit, :sort => @sort}
 
-=params[:ratings]
-
 %table#movies
   %thead
     %tr
